@@ -1,0 +1,5078 @@
+openapi: 3.0.0
+info:
+  description: |
+    Postmark makes sending and receiving email
+    incredibly easy.
+  title: Postmark API
+  version: 1.0.0
+  x-apisguru-categories:
+  - email
+  x-logo:
+    url: https://pbs.twimg.com/profile_images/879295889185157120/ZYlwxzeY_400x400.jpg
+  x-origin:
+  - version: "2.0"
+    format: swagger
+    url: https://postmarkapp.com/swagger/server.yml
+  x-providerName: postmarkapp.com
+  x-serviceName: server
+  x-konfig-ignore:
+    object-with-no-properties: true
+  x-konfig-has-globally-required-security: true
+servers:
+- url: api.postmarkapp.com
+security:
+- serverToken: []
+tags:
+- name: Stats API
+- name: Messages API
+- name: Templates API
+- name: Bounces API
+- name: Sending API
+- name: Inbound Rules API
+- name: Server Configuration API
+paths:
+  /bounces:
+    get:
+      operationId: BouncesApi_listBounces
+      parameters:
+      - description: Number of bounces to return per request. Max 500.
+        explode: true
+        in: query
+        name: count
+        required: true
+        schema:
+          maximum: 500
+          type: integer
+        style: form
+      - description: Number of bounces to skip.
+        explode: true
+        in: query
+        name: offset
+        required: true
+        schema:
+          type: integer
+        style: form
+      - description: Filter by type of bounce
+        explode: true
+        in: query
+        name: type
+        required: false
+        schema:
+          enum:
+          - HardBounce
+          - Transient
+          - Unsubscribe
+          - Subscribe
+          - AutoResponder
+          - AddressChange
+          - DnsError
+          - SpamNotification
+          - OpenRelayTest
+          - Unknown
+          - SoftBounce
+          - VirusNotification
+          - MailFrontier Matador.
+          - BadEmailAddress
+          - SpamComplaint
+          - ManuallyDeactivated
+          - Unconfirmed
+          - Blocked
+          - SMTPApiError
+          - InboundError
+          - DMARCPolicy
+          - TemplateRenderingFailed
+          type: string
+        style: form
+      - description: Filter by emails that were deactivated by Postmark due to the
+          bounce. Set to true or false. If this isn't specified it will return both
+          active and inactive.
+        explode: true
+        in: query
+        name: inactive
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: Filter by email address
+        explode: true
+        in: query
+        name: emailFilter
+        required: false
+        schema:
+          format: email
+          type: string
+        style: form
+      - description: Filter by messageID
+        explode: true
+        in: query
+        name: messageID
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Filter by tag
+        explode: true
+        in: query
+        name: tag
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Filter messages up to the date specified. e.g. `2014-02-01`
+        explode: true
+        in: query
+        name: todate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - description: Filter messages starting from the date specified. e.g. `2014-02-01`
+        explode: true
+        in: query
+        name: fromdate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BounceSearchResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Get bounces
+      tags:
+      - Bounces API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--bounces
+      x-accepts: application/json
+  /bounces/{bounceid}:
+    get:
+      operationId: BouncesApi_getBounce
+      parameters:
+      - description: The ID of the bounce to retrieve.
+        explode: false
+        in: path
+        name: bounceid
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BouncesApiGetBounceResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Get a single bounce
+      tags:
+      - Bounces API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--bounces-bounceid
+      x-accepts: application/json
+  /bounces/{bounceid}/activate:
+    put:
+      operationId: BouncesApi_activateBounce
+      parameters:
+      - description: The ID of the Bounce to activate.
+        explode: false
+        in: path
+        name: bounceid
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BouncesApiActivateBounceResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Activate a bounce
+      tags:
+      - Bounces API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-put--bounces-bounceid-activate
+      x-accepts: application/json
+  /bounces/{bounceid}/dump:
+    get:
+      operationId: BouncesApi_getDump
+      parameters:
+      - description: The ID for the bounce dump to retrieve.
+        explode: false
+        in: path
+        name: bounceid
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BouncesApiGetDumpResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Get bounce dump
+      tags:
+      - Bounces API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--bounces-bounceid-dump
+      x-accepts: application/json
+  /deliverystats:
+    get:
+      operationId: BouncesApi_getDeliveryStats
+      parameters: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliveryStatsResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Get delivery stats
+      tags:
+      - Bounces API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--deliverystats
+      x-accepts: application/json
+  /email:
+    post:
+      operationId: SendingApi_sendSingleEmail
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEmailRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendEmailResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Send a single email
+      tags:
+      - Sending API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--email
+      x-content-type: application/json
+      x-accepts: application/json
+  /email/batch:
+    post:
+      operationId: SendingApi_sendBatchEmails
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEmailBatchRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendEmailBatchResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Send a batch of emails
+      tags:
+      - Sending API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--email-batch
+      x-content-type: application/json
+      x-accepts: application/json
+  /email/batchWithTemplates:
+    post:
+      operationId: SendingApi_sendBatchWithTemplates
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEmailTemplatedBatchRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendEmailBatchResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Send a batch of email using templates.
+      tags:
+      - Sending API
+      - Templates API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--email-batchWithTemplates
+      x-content-type: application/json
+      x-accepts: application/json
+  /email/withTemplate:
+    post:
+      operationId: SendingApi_sendEmailTemplate
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailWithTemplateRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendEmailResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Send an email using a Template
+      tags:
+      - Sending API
+      - Templates API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--email-withTemplate
+      x-content-type: application/json
+      x-accepts: application/json
+  /messages/inbound:
+    get:
+      operationId: MessagesApi_searchInboundMessages
+      parameters:
+      - description: Number of messages to return per request. Max 500.
+        explode: true
+        in: query
+        name: count
+        required: true
+        schema:
+          type: integer
+        style: form
+      - description: Number of messages to skip
+        explode: true
+        in: query
+        name: offset
+        required: true
+        schema:
+          type: integer
+        style: form
+      - description: Filter by the user who was receiving the email
+        explode: true
+        in: query
+        name: recipient
+        required: false
+        schema:
+          format: email
+          type: string
+        style: form
+      - description: Filter by the sender email address
+        explode: true
+        in: query
+        name: fromemail
+        required: false
+        schema:
+          format: email
+          type: string
+        style: form
+      - description: Filter by email subject
+        explode: true
+        in: query
+        name: subject
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Filter by mailboxhash
+        explode: true
+        in: query
+        name: mailboxhash
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Filter by tag
+        explode: true
+        in: query
+        name: tag
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Filter by status (`blocked`, `processed`, `queued`, `failed`,\
+          \ `scheduled`)"
+        explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          enum:
+          - blocked
+          - processed
+          - queued
+          - failed
+          - scheduled
+          type: string
+        style: form
+      - description: Filter messages up to the date specified. e.g. `2014-02-01`
+        explode: true
+        in: query
+        name: todate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - description: Filter messages starting from the date specified. e.g. `2014-02-01`
+        explode: true
+        in: query
+        name: fromdate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InboundSearchResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Inbound message search
+      tags:
+      - Messages API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--messages-inbound
+      x-accepts: application/json
+  /messages/inbound/{messageid}/bypass:
+    put:
+      operationId: MessagesApi_updateBypassRulesForInboundMessage
+      parameters:
+      - description: The ID of the message which should bypass inbound rules.
+        explode: false
+        in: path
+        name: messageid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Bypass rules for a blocked inbound message
+      tags:
+      - Messages API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-put--messages-inbound-messageid-bypass
+      x-accepts: application/json
+  /messages/inbound/{messageid}/details:
+    get:
+      operationId: MessagesApi_getInboundMessageDetails
+      parameters:
+      - description: The ID of the message for which to details will be retrieved.
+        explode: false
+        in: path
+        name: messageid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessagesApiGetInboundMessageDetailsResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Inbound message details
+      tags:
+      - Messages API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--messages-inbound-messageid-details
+      x-accepts: application/json
+  /messages/inbound/{messageid}/retry:
+    put:
+      operationId: MessagesApi_retryInboundMessage
+      parameters:
+      - description: The ID of the inbound message on which we should retry processing.
+        explode: false
+        in: path
+        name: messageid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Retry a failed inbound message for processing
+      tags:
+      - Messages API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-put--messages-inbound-messageid-retry
+      x-accepts: application/json
+  /messages/outbound:
+    get:
+      operationId: MessagesApi_searchOutboundMessages
+      parameters:
+      - description: Number of messages to return per request. Max 500.
+        explode: true
+        in: query
+        name: count
+        required: true
+        schema:
+          type: integer
+        style: form
+      - description: Number of messages to skip
+        explode: true
+        in: query
+        name: offset
+        required: true
+        schema:
+          type: integer
+        style: form
+      - description: Filter by the user who was receiving the email
+        explode: true
+        in: query
+        name: recipient
+        required: false
+        schema:
+          format: email
+          type: string
+        style: form
+      - description: Filter by the sender email address
+        explode: true
+        in: query
+        name: fromemail
+        required: false
+        schema:
+          format: email
+          type: string
+        style: form
+      - description: Filter by tag
+        explode: true
+        in: query
+        name: tag
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Filter by status (`queued` or `sent`)
+        explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          enum:
+          - queued
+          - sent
+          type: string
+        style: form
+      - description: Filter messages up to the date specified. e.g. `2014-02-01`
+        explode: true
+        in: query
+        name: todate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - description: Filter messages starting from the date specified. e.g. `2014-02-01`
+        explode: true
+        in: query
+        name: fromdate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OutboundSearchResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Outbound message search
+      tags:
+      - Messages API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--messages-outbound
+      x-accepts: application/json
+  /messages/outbound/clicks:
+    get:
+      operationId: MessagesApi_getAllClicks
+      parameters:
+      - description: Number of message clicks to return per request. Max 500.
+        explode: true
+        in: query
+        name: count
+        required: true
+        schema:
+          type: integer
+        style: form
+      - description: Number of messages to skip
+        explode: true
+        in: query
+        name: offset
+        required: true
+        schema:
+          type: integer
+        style: form
+      - description: "Filter by To, Cc, Bcc"
+        explode: true
+        in: query
+        name: recipient
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Filter by tag
+        explode: true
+        in: query
+        name: tag
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Filter by client name, i.e. Outlook, Gmail"
+        explode: true
+        in: query
+        name: client_name
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Filter by company, i.e. Microsoft, Apple, Google"
+        explode: true
+        in: query
+        name: client_company
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Filter by client family, i.e. OS X, Chrome"
+        explode: true
+        in: query
+        name: client_family
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Filter by full OS name and specific version, i.e. OS X 10.9\
+          \ Mavericks, Windows 7"
+        explode: true
+        in: query
+        name: os_name
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Filter by kind of OS used without specific version, i.e. OS\
+          \ X, Windows"
+        explode: true
+        in: query
+        name: os_family
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Filter by company which produced the OS, i.e. Apple Computer,\
+          \ Inc., Microsoft Corporation"
+        explode: true
+        in: query
+        name: os_company
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Filter by platform, i.e. webmail, desktop, mobile"
+        explode: true
+        in: query
+        name: platform
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Filter by country messages were opened in, i.e. Denmark, Russia"
+        explode: true
+        in: query
+        name: country
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Filter by full name of region messages were opened in, i.e.\
+          \ Moscow, New York"
+        explode: true
+        in: query
+        name: region
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Filter by full name of region messages were opened in, i.e.\
+          \ Moscow, New York"
+        explode: true
+        in: query
+        name: city
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessagesApiGetAllClicksResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Clicks for a all messages
+      tags:
+      - Messages API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--messages-outbound-clicks
+      x-accepts: application/json
+  /messages/outbound/clicks/{messageid}:
+    get:
+      operationId: MessagesApi_getMessageClicks
+      parameters:
+      - description: The ID of the Outbound Message for which click statistics should
+          be retrieved.
+        explode: false
+        in: path
+        name: messageid
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Number of message clicks to return per request. Max 500.
+        explode: true
+        in: query
+        name: count
+        required: true
+        schema:
+          default: 1
+          example: 1
+          maximum: 500
+          minimum: 1
+          type: integer
+          x-konfig-original-example: 1
+          x-konfig-generated-schema: konfig-generated-schema-paths--messages-outbound-clicks-messageid-get-parameters-1-schema
+        style: form
+      - description: Number of messages to skip.
+        explode: true
+        in: query
+        name: offset
+        required: true
+        schema:
+          default: 0
+          example: 0
+          minimum: 0
+          type: integer
+          x-konfig-original-example: 0
+          x-konfig-generated-schema: konfig-generated-schema-paths--messages-outbound-clicks-messageid-get-parameters-2-schema
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessagesApiGetMessageClicksResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Retrieve Message Clicks
+      tags:
+      - Messages API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--messages-outbound-clicks-messageid
+      x-accepts: application/json
+  /messages/outbound/opens:
+    get:
+      operationId: MessagesApi_listOpensForOutbound
+      parameters:
+      - description: Number of message opens to return per request. Max 500.
+        explode: true
+        in: query
+        name: count
+        required: true
+        schema:
+          type: integer
+        style: form
+      - description: Number of messages to skip
+        explode: true
+        in: query
+        name: offset
+        required: true
+        schema:
+          type: integer
+        style: form
+      - description: "Filter by To, Cc, Bcc"
+        explode: true
+        in: query
+        name: recipient
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Filter by tag
+        explode: true
+        in: query
+        name: tag
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Filter by client name, i.e. Outlook, Gmail"
+        explode: true
+        in: query
+        name: client_name
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Filter by company, i.e. Microsoft, Apple, Google"
+        explode: true
+        in: query
+        name: client_company
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Filter by client family, i.e. OS X, Chrome"
+        explode: true
+        in: query
+        name: client_family
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Filter by full OS name and specific version, i.e. OS X 10.9\
+          \ Mavericks, Windows 7"
+        explode: true
+        in: query
+        name: os_name
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Filter by kind of OS used without specific version, i.e. OS\
+          \ X, Windows"
+        explode: true
+        in: query
+        name: os_family
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Filter by company which produced the OS, i.e. Apple Computer,\
+          \ Inc., Microsoft Corporation"
+        explode: true
+        in: query
+        name: os_company
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Filter by platform, i.e. webmail, desktop, mobile"
+        explode: true
+        in: query
+        name: platform
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Filter by country messages were opened in, i.e. Denmark, Russia"
+        explode: true
+        in: query
+        name: country
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Filter by full name of region messages were opened in, i.e.\
+          \ Moscow, New York"
+        explode: true
+        in: query
+        name: region
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Filter by full name of region messages were opened in, i.e.\
+          \ Moscow, New York"
+        explode: true
+        in: query
+        name: city
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessagesApiListOpensForOutboundResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Opens for all messages
+      tags:
+      - Messages API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--messages-outbound-opens
+      x-accepts: application/json
+  /messages/outbound/opens/{messageid}:
+    get:
+      operationId: MessagesApi_getMessageOpens
+      parameters:
+      - description: The ID of the Outbound Message for which open statistics should
+          be retrieved.
+        explode: false
+        in: path
+        name: messageid
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Number of message opens to return per request. Max 500.
+        explode: true
+        in: query
+        name: count
+        required: true
+        schema:
+          default: 1
+          example: 1
+          maximum: 500
+          minimum: 1
+          type: integer
+          x-konfig-original-example: 1
+          x-konfig-generated-schema: konfig-generated-schema-paths--messages-outbound-opens-messageid-get-parameters-1-schema
+        style: form
+      - description: Number of messages to skip.
+        explode: true
+        in: query
+        name: offset
+        required: true
+        schema:
+          default: 0
+          example: 0
+          minimum: 0
+          type: integer
+          x-konfig-original-example: 0
+          x-konfig-generated-schema: konfig-generated-schema-paths--messages-outbound-opens-messageid-get-parameters-2-schema
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessagesApiGetMessageOpensResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Retrieve Message Opens
+      tags:
+      - Messages API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--messages-outbound-opens-messageid
+      x-accepts: application/json
+  /messages/outbound/{messageid}/details:
+    get:
+      operationId: MessagesApi_getOutboundMessageDetails
+      parameters:
+      - description: The ID of the message for which to retrieve details.
+        explode: false
+        in: path
+        name: messageid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessagesApiGetOutboundMessageDetailsResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Outbound message details
+      tags:
+      - Messages API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--messages-outbound-messageid-details
+      x-accepts: application/json
+  /messages/outbound/{messageid}/dump:
+    get:
+      operationId: MessagesApi_getMessageDump
+      parameters:
+      - description: The ID of the message for which to retrieve a dump.
+        explode: false
+        in: path
+        name: messageid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessagesApiGetMessageDumpResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Outbound message dump
+      tags:
+      - Messages API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--messages-outbound-messageid-dump
+      x-accepts: application/json
+  /server:
+    get:
+      operationId: ServerConfigurationApi_getConfiguration
+      parameters: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerConfigurationApiGetConfigurationResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Get Server Configuration
+      tags:
+      - Server Configuration API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--server
+      x-accepts: application/json
+    put:
+      operationId: ServerConfigurationApi_updateConfiguration
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditServerConfigurationRequest'
+        description: The settings that should be modified for the current server.
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerConfigurationApiUpdateConfigurationResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Edit Server Configuration
+      tags:
+      - Server Configuration API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-put--server
+      x-content-type: application/json
+      x-accepts: application/json
+  /stats/outbound:
+    get:
+      operationId: StatsApi_getOutboundOverview
+      parameters:
+      - description: Filter by tag
+        explode: true
+        in: query
+        name: tag
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Filter stats starting from the date specified. e.g. `2014-01-01`
+        explode: true
+        in: query
+        name: fromdate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - description: Filter stats up to the date specified. e.g. `2014-02-01`
+        explode: true
+        in: query
+        name: todate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OutboundOverviewStatsResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Get outbound overview
+      tags:
+      - Stats API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--stats-outbound
+      x-accepts: application/json
+  /stats/outbound/bounces:
+    get:
+      operationId: StatsApi_getBounceCounts
+      parameters:
+      - description: Filter by tag
+        explode: true
+        in: query
+        name: tag
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Filter stats starting from the date specified. e.g. `2014-01-01`
+        explode: true
+        in: query
+        name: fromdate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - description: Filter stats up to the date specified. e.g. `2014-02-01`
+        explode: true
+        in: query
+        name: todate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsApiGetBounceCountsResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Get bounce counts
+      tags:
+      - Stats API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--stats-outbound-bounces
+      x-accepts: application/json
+  /stats/outbound/clicks:
+    get:
+      operationId: StatsApi_getOutboundClickCounts
+      parameters:
+      - description: Filter by tag
+        explode: true
+        in: query
+        name: tag
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Filter stats starting from the date specified. e.g. `2014-01-01`
+        explode: true
+        in: query
+        name: fromdate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - description: Filter stats up to the date specified. e.g. `2014-02-01`
+        explode: true
+        in: query
+        name: todate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsApiGetOutboundClickCountsResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Get click counts
+      tags:
+      - Stats API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--stats-outbound-clicks
+      x-accepts: application/json
+  /stats/outbound/clicks/browserfamilies:
+    get:
+      operationId: StatsApi_getOutboundClicksBrowserFamilies
+      parameters:
+      - description: Filter by tag
+        explode: true
+        in: query
+        name: tag
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Filter stats starting from the date specified. e.g. `2014-01-01`
+        explode: true
+        in: query
+        name: fromdate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - description: Filter stats up to the date specified. e.g. `2014-02-01`
+        explode: true
+        in: query
+        name: todate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsApiGetOutboundClicksBrowserFamiliesResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Get browser usage by family
+      tags:
+      - Stats API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--stats-outbound-clicks-browserfamilies
+      x-accepts: application/json
+  /stats/outbound/clicks/location:
+    get:
+      operationId: StatsApi_getOutboundClicksLocation
+      parameters:
+      - description: Filter by tag
+        explode: true
+        in: query
+        name: tag
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Filter stats starting from the date specified. e.g. `2014-01-01`
+        explode: true
+        in: query
+        name: fromdate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - description: Filter stats up to the date specified. e.g. `2014-02-01`
+        explode: true
+        in: query
+        name: todate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsApiGetOutboundClicksLocationResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Get clicks by body location
+      tags:
+      - Stats API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--stats-outbound-clicks-location
+      x-accepts: application/json
+  /stats/outbound/clicks/platforms:
+    get:
+      operationId: StatsApi_getBrowserPlatformUsage
+      parameters:
+      - description: Filter by tag
+        explode: true
+        in: query
+        name: tag
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Filter stats starting from the date specified. e.g. `2014-01-01`
+        explode: true
+        in: query
+        name: fromdate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - description: Filter stats up to the date specified. e.g. `2014-02-01`
+        explode: true
+        in: query
+        name: todate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsApiGetBrowserPlatformUsageResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Get browser plaform usage
+      tags:
+      - Stats API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--stats-outbound-clicks-platforms
+      x-accepts: application/json
+  /stats/outbound/opens:
+    get:
+      operationId: StatsApi_getEmailOpenCounts
+      parameters:
+      - description: Filter by tag
+        explode: true
+        in: query
+        name: tag
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Filter stats starting from the date specified. e.g. `2014-01-01`
+        explode: true
+        in: query
+        name: fromdate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - description: Filter stats up to the date specified. e.g. `2014-02-01`
+        explode: true
+        in: query
+        name: todate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsApiGetEmailOpenCountsResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Get email open counts
+      tags:
+      - Stats API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--stats-outbound-opens
+      x-accepts: application/json
+  /stats/outbound/opens/emailclients:
+    get:
+      operationId: StatsApi_getEmailClientUsage
+      parameters:
+      - description: Filter by tag
+        explode: true
+        in: query
+        name: tag
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Filter stats starting from the date specified. e.g. `2014-01-01`
+        explode: true
+        in: query
+        name: fromdate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - description: Filter stats up to the date specified. e.g. `2014-02-01`
+        explode: true
+        in: query
+        name: todate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsApiGetEmailClientUsageResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Get email client usage
+      tags:
+      - Stats API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--stats-outbound-opens-emailclients
+      x-accepts: application/json
+  /stats/outbound/opens/platforms:
+    get:
+      operationId: StatsApi_getEmailPlatformUsage
+      parameters:
+      - description: Filter by tag
+        explode: true
+        in: query
+        name: tag
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Filter stats starting from the date specified. e.g. `2014-01-01`
+        explode: true
+        in: query
+        name: fromdate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - description: Filter stats up to the date specified. e.g. `2014-02-01`
+        explode: true
+        in: query
+        name: todate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsApiGetEmailPlatformUsageResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Get email platform usage
+      tags:
+      - Stats API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--stats-outbound-opens-platforms
+      x-accepts: application/json
+  /stats/outbound/sends:
+    get:
+      operationId: StatsApi_getSentCounts
+      parameters:
+      - description: Filter by tag
+        explode: true
+        in: query
+        name: tag
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Filter stats starting from the date specified. e.g. `2014-01-01`
+        explode: true
+        in: query
+        name: fromdate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - description: Filter stats up to the date specified. e.g. `2014-02-01`
+        explode: true
+        in: query
+        name: todate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SentCountsResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Get sent counts
+      tags:
+      - Stats API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--stats-outbound-sends
+      x-accepts: application/json
+  /stats/outbound/spam:
+    get:
+      operationId: StatsApi_getSpamComplaints
+      parameters:
+      - description: Filter by tag
+        explode: true
+        in: query
+        name: tag
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Filter stats starting from the date specified. e.g. `2014-01-01`
+        explode: true
+        in: query
+        name: fromdate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - description: Filter stats up to the date specified. e.g. `2014-02-01`
+        explode: true
+        in: query
+        name: todate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsApiGetSpamComplaintsResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Get spam complaints
+      tags:
+      - Stats API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--stats-outbound-spam
+      x-accepts: application/json
+  /stats/outbound/tracked:
+    get:
+      operationId: StatsApi_getTrackedEmailCounts
+      parameters:
+      - description: Filter by tag
+        explode: true
+        in: query
+        name: tag
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Filter stats starting from the date specified. e.g. `2014-01-01`
+        explode: true
+        in: query
+        name: fromdate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - description: Filter stats starting from the date specified. e.g. `2014-01-01`
+        explode: true
+        in: query
+        name: todate
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsApiGetTrackedEmailCountsResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Get tracked email counts
+      tags:
+      - Stats API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--stats-outbound-tracked
+      x-accepts: application/json
+  /templates:
+    get:
+      operationId: TemplatesApi_listTemplates
+      parameters:
+      - description: The number of Templates to return
+        explode: true
+        in: query
+        name: Count
+        required: true
+        schema:
+          format: int
+          type: number
+        style: form
+      - description: The number of Templates to "skip" before returning results.
+        explode: true
+        in: query
+        name: Offset
+        required: true
+        schema:
+          format: int
+          type: number
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplatesApiListTemplatesResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Get the Templates associated with this Server
+      tags:
+      - Templates API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--templates
+      x-accepts: application/json
+    post:
+      operationId: TemplatesApi_createTemplate
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTemplateRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplatesApiCreateTemplateResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Create a Template
+      tags:
+      - Templates API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--templates
+      x-content-type: application/json
+      x-accepts: application/json
+  /templates/validate:
+    post:
+      operationId: TemplatesApi_validateTemplateContent
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TemplateValidationRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplatesApiValidateTemplateContentResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Test Template Content
+      tags:
+      - Templates API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--templates-validate
+      x-content-type: application/json
+      x-accepts: application/json
+  /templates/{templateIdOrAlias}:
+    delete:
+      operationId: TemplatesApi_deleteTemplate
+      parameters:
+      - description: The 'TemplateID' or 'Alias' value for the Template you wish to
+          delete.
+        explode: false
+        in: path
+        name: templateIdOrAlias
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplatesApiDeleteTemplateResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Delete a Template
+      tags:
+      - Templates API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-delete--templates-templateIdOrAlias
+      x-accepts: application/json
+    get:
+      operationId: TemplatesApi_getTemplateById
+      parameters:
+      - description: The 'TemplateID' or 'Alias' value for the Template you wish to
+          retrieve.
+        explode: false
+        in: path
+        name: templateIdOrAlias
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplatesApiGetTemplateByIdResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Get a Template
+      tags:
+      - Templates API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--templates-templateIdOrAlias
+      x-accepts: application/json
+    put:
+      operationId: TemplatesApi_updateTemplate
+      parameters:
+      - description: The 'TemplateID' or 'Alias' value for the Template you wish to
+          update.
+        explode: false
+        in: path
+        name: templateIdOrAlias
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditTemplateRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplatesApiUpdateTemplateResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Update a Template
+      tags:
+      - Templates API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-put--templates-templateIdOrAlias
+      x-content-type: application/json
+      x-accepts: application/json
+  /triggers/inboundrules:
+    get:
+      operationId: InboundRulesApi_listTriggers
+      parameters:
+      - description: Number of records to return per request.
+        explode: true
+        in: query
+        name: count
+        required: true
+        schema:
+          type: integer
+        style: form
+      - description: Number of records to skip.
+        explode: true
+        in: query
+        name: offset
+        required: true
+        schema:
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InboundRulesApiListTriggersResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: List inbound rule triggers
+      tags:
+      - Inbound Rules API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--triggers-inboundrules
+      x-accepts: application/json
+    post:
+      operationId: InboundRulesApi_createTrigger
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInboundRuleRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InboundRulesApiCreateTriggerResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Create an inbound rule trigger
+      tags:
+      - Inbound Rules API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--triggers-inboundrules
+      x-content-type: application/json
+      x-accepts: application/json
+  /triggers/inboundrules/{triggerid}:
+    delete:
+      operationId: InboundRulesApi_deleteSingleTrigger
+      parameters:
+      - description: The ID of the Inbound Rule that should be deleted.
+        explode: false
+        in: path
+        name: triggerid
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: OK
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardPostmarkResponse'
+          description: An error was generated due to incorrect use of the API. See
+            the Message associated with this response for more information.
+          x-do-not-generate: true
+        "500":
+          description: Indicates an internal server error occurred.
+      security:
+      - serverToken: []
+      summary: Delete a single trigger
+      tags:
+      - Inbound Rules API
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-delete--triggers-inboundrules-triggerid
+      x-accepts: application/json
+components:
+  responses:
+    "422":
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StandardPostmarkResponse'
+      description: An error was generated due to incorrect use of the API. See the
+        Message associated with this response for more information.
+      x-do-not-generate: true
+    "500":
+      description: Indicates an internal server error occurred.
+  schemas:
+    Attachment:
+      description: An attachment for an email message.
+      example:
+        ContentType: ContentType
+        Content: Content
+        ContentID: ContentID
+        Name: Name
+      properties:
+        Content:
+          type: string
+        ContentID:
+          type: string
+        ContentType:
+          type: string
+        Name:
+          type: string
+    AttachmentCollection:
+      items:
+        $ref: '#/components/schemas/Attachment'
+      type: array
+    BounceActivationResponse:
+      properties:
+        Bounce:
+          $ref: '#/components/schemas/BounceInfoResponse'
+        Message:
+          type: string
+    BounceCountElement:
+      example:
+        Type: Type
+        Count: 0
+        Name: Name
+      properties:
+        Count:
+          type: integer
+        Name:
+          type: string
+        Type:
+          type: string
+    BounceDumpResponse:
+      properties:
+        Body:
+          description: Raw source of bounce. If no dump is available this will return
+            an empty string.
+          type: string
+    BounceInfoResponse:
+      example:
+        Description: Description
+        Email: Email
+        TypeCode: 0
+        DumpAvailable: true
+        Subject: Subject
+        Name: Name
+        Type: Type
+        Details: Details
+        Content: Content
+        BouncedAt: 2000-01-23T04:56:07.000+00:00
+        Inactive: true
+        ID: ID
+        Tag: Tag
+        CanActivate: true
+        MessageID: MessageID
+      properties:
+        BouncedAt:
+          format: date-time
+          type: string
+        CanActivate:
+          type: boolean
+        Content:
+          type: string
+        Description:
+          type: string
+        Details:
+          type: string
+        DumpAvailable:
+          type: boolean
+        Email:
+          format: email
+          type: string
+        ID:
+          type: string
+        Inactive:
+          type: boolean
+        MessageID:
+          type: string
+        Name:
+          type: string
+        Subject:
+          type: string
+        Tag:
+          type: string
+        Type:
+          type: string
+        TypeCode:
+          type: integer
+    BounceSearchResponse:
+      description: ""
+      example:
+        Bounces:
+        - Description: Description
+          Email: Email
+          TypeCode: 0
+          DumpAvailable: true
+          Subject: Subject
+          Name: Name
+          Type: Type
+          Details: Details
+          Content: Content
+          BouncedAt: 2000-01-23T04:56:07.000+00:00
+          Inactive: true
+          ID: ID
+          Tag: Tag
+          CanActivate: true
+          MessageID: MessageID
+        - Description: Description
+          Email: Email
+          TypeCode: 0
+          DumpAvailable: true
+          Subject: Subject
+          Name: Name
+          Type: Type
+          Details: Details
+          Content: Content
+          BouncedAt: 2000-01-23T04:56:07.000+00:00
+          Inactive: true
+          ID: ID
+          Tag: Tag
+          CanActivate: true
+          MessageID: MessageID
+        TotalCount: 6
+      properties:
+        Bounces:
+          items:
+            $ref: '#/components/schemas/BounceInfoResponse'
+          type: array
+        TotalCount:
+          type: integer
+      x-konfig-is-used-in-successful-response: true
+    CreateInboundRuleRequest:
+      description: ""
+      example:
+        Rule: Rule
+      properties:
+        Rule:
+          format: email
+          type: string
+    CreateTemplateRequest:
+      description: The contents required for creating a new template.
+      example:
+        TextBody: TextBody
+        HtmlBody: HtmlBody
+        Alias: Alias
+        Subject: Subject
+        Name: Name
+      properties:
+        Alias:
+          description: "The optional string identifier for referring to this Template\
+            \ (numbers, letters, and '.', '-', '_' characters, starts with a letter)."
+          type: string
+        HtmlBody:
+          description: The HTML template definition for this Template.
+          type: string
+        Name:
+          description: The friendly display name for the template.
+          type: string
+        Subject:
+          description: The Subject template definition for this Template.
+          type: string
+        TextBody:
+          description: The Text template definition for this Template.
+          type: string
+      required:
+      - Name
+      - Subject
+    DeliveryStatsResponse:
+      description: ""
+      example:
+        InactiveMails: 6
+        Bounces:
+        - Type: Type
+          Count: 0
+          Name: Name
+        - Type: Type
+          Count: 0
+          Name: Name
+      properties:
+        Bounces:
+          items:
+            $ref: '#/components/schemas/BounceCountElement'
+          type: array
+        InactiveMails:
+          type: integer
+      x-konfig-is-used-in-successful-response: true
+    DynamicResponse:
+      description: The properties of this object will vary based request parameters.
+    EditServerConfigurationRequest:
+      example:
+        ClickHookUrl: ClickHookUrl
+        Color: purple
+        DeliveryHookUrl: DeliveryHookUrl
+        RawEmailEnabled: true
+        TrackLinks: None
+        InboundSpamThreshold: 0
+        OpenHookUrl: OpenHookUrl
+        BounceHookUrl: BounceHookUrl
+        InboundHookUrl: InboundHookUrl
+        Name: Name
+        TrackOpens: true
+        PostFirstOpenOnly: true
+        InboundDomain: InboundDomain
+        SmtpApiActivated: true
+      properties:
+        BounceHookUrl:
+          type: string
+        ClickHookUrl:
+          description: Webhook url allowing real-time notification when tracked links
+            are clicked.
+          type: string
+        Color:
+          enum:
+          - purple
+          - blue
+          - turqoise
+          - green
+          - red
+          - yellow
+          - grey
+          type: string
+        DeliveryHookUrl:
+          type: string
+        InboundDomain:
+          type: string
+        InboundHookUrl:
+          type: string
+        InboundSpamThreshold:
+          type: integer
+        Name:
+          type: string
+        OpenHookUrl:
+          type: string
+        PostFirstOpenOnly:
+          type: boolean
+        RawEmailEnabled:
+          type: boolean
+        SmtpApiActivated:
+          type: boolean
+        TrackLinks:
+          enum:
+          - None
+          - HtmlAndText
+          - HtmlOnly
+          - TextOnly
+          type: string
+        TrackOpens:
+          type: boolean
+    EditTemplateRequest:
+      description: The contents required for creating a new template.
+      example:
+        TextBody: TextBody
+        HtmlBody: HtmlBody
+        Alias: Alias
+        Subject: Subject
+        Name: Name
+      properties:
+        Alias:
+          description: "The optional string identifier for referring to this Template\
+            \ (numbers, letters, and '.', '-', '_' characters, starts with a letter)."
+          type: string
+        HtmlBody:
+          description: The HTML template definition for this Template.
+          type: string
+        Name:
+          description: The friendly display name for the template.
+          type: string
+        Subject:
+          description: The Subject template definition for this Template.
+          type: string
+        TextBody:
+          description: The Text template definition for this Template.
+          type: string
+      required:
+      - TemplateId
+    EmailNameAddressPair:
+      description: ""
+      example:
+        Email: Email
+        Name: Name
+      properties:
+        Email:
+          type: string
+        Name:
+          type: string
+    EmailWithTemplateRequest:
+      example:
+        Cc: Cc
+        Bcc: Bcc
+        InlineCss: true
+        Headers:
+        - Value: Value
+          Name: Name
+        - Value: Value
+          Name: Name
+        TrackLinks: None
+        From: From
+        TemplateModel: "{}"
+        Attachments:
+        - ContentType: ContentType
+          Content: Content
+          ContentID: ContentID
+          Name: Name
+        - ContentType: ContentType
+          Content: Content
+          ContentID: ContentID
+          Name: Name
+        TemplateAlias: TemplateAlias
+        TrackOpens: true
+        ReplyTo: ReplyTo
+        Tag: Tag
+        To: To
+        TemplateId: 0
+      properties:
+        Attachments:
+          items:
+            $ref: '#/components/schemas/Attachment'
+          type: array
+        Bcc:
+          format: email
+          type: string
+        Cc:
+          format: email
+          type: string
+        From:
+          format: email
+          type: string
+        Headers:
+          items:
+            $ref: '#/components/schemas/MessageHeader'
+          type: array
+        InlineCss:
+          default: true
+          example: true
+          type: boolean
+          x-konfig-original-example: true
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-EmailWithTemplateRequest-properties-InlineCss
+        ReplyTo:
+          type: string
+        Tag:
+          type: string
+        TemplateAlias:
+          description: Required if 'TemplateId' is not specified.
+          type: string
+        TemplateId:
+          description: Required if 'TemplateAlias' is not specified.
+          type: integer
+        TemplateModel:
+          type: object
+        To:
+          format: email
+          type: string
+        TrackLinks:
+          description: "Replace links in content to enable \"click tracking\" stats.\
+            \ Default is 'null', which uses the server's LinkTracking setting'."
+          enum:
+          - None
+          - HtmlAndText
+          - HtmlOnly
+          - TextOnly
+          type: string
+        TrackOpens:
+          description: Activate open tracking for this email.
+          type: boolean
+      required:
+      - From
+      - TemplateAlias
+      - TemplateId
+      - TemplateModel
+      - To
+    ExtendedMessageClickEventInformation:
+      description: ""
+      properties:
+        ClickLocation:
+          type: string
+        Client:
+          $ref: '#/components/schemas/ExtendedMessageClickEventInformation_Client'
+        Geo:
+          $ref: '#/components/schemas/ExtendedMessageClickEventInformation_Geo'
+        MessageID:
+          type: string
+        OS:
+          $ref: '#/components/schemas/ExtendedMessageClickEventInformation_OS'
+        OriginalLink:
+          type: string
+        Platform:
+          type: string
+        ReceivedAt:
+          format: date-time
+          type: string
+        Recipient:
+          format: email
+          type: string
+        Tag:
+          type: string
+        UserAgent:
+          type: string
+    ExtendedMessageOpenEventInformation:
+      description: ""
+      properties:
+        Client:
+          $ref: '#/components/schemas/ExtendedMessageClickEventInformation_Client'
+        FirstOpen:
+          type: boolean
+        Geo:
+          $ref: '#/components/schemas/ExtendedMessageClickEventInformation_Geo'
+        MessageID:
+          type: string
+        OS:
+          $ref: '#/components/schemas/ExtendedMessageClickEventInformation_OS'
+        Platform:
+          type: string
+        ReceivedAt:
+          format: date-time
+          type: string
+        Recipient:
+          format: email
+          type: string
+        Tag:
+          type: string
+        UserAgent:
+          type: string
+    HeaderCollection:
+      items:
+        $ref: '#/components/schemas/MessageHeader'
+      type: array
+    InboundMessageDetail:
+      description: ""
+      example:
+        Cc: Cc
+        Status: Status
+        CcFull:
+        - Email: Email
+          Name: Name
+        - Email: Email
+          Name: Name
+        From: From
+        OriginalRecipient: OriginalRecipient
+        Attachments:
+        - ContentType: ContentType
+          Content: Content
+          ContentID: ContentID
+          Name: Name
+        - ContentType: ContentType
+          Content: Content
+          ContentID: ContentID
+          Name: Name
+        Date: Date
+        Subject: Subject
+        ReplyTo: ReplyTo
+        FromName: FromName
+        MailboxHash: MailboxHash
+        Tag: Tag
+        To: To
+        FromFull:
+          Email: Email
+          Name: Name
+        ToFull:
+        - Email: Email
+          Name: Name
+        - Email: Email
+          Name: Name
+        MessageID: MessageID
+      properties:
+        Attachments:
+          items:
+            $ref: '#/components/schemas/Attachment'
+          type: array
+        Cc:
+          type: string
+        CcFull:
+          items:
+            $ref: '#/components/schemas/EmailNameAddressPair'
+          type: array
+        Date:
+          type: string
+        From:
+          type: string
+        FromFull:
+          $ref: '#/components/schemas/InboundMessageDetail_FromFull'
+        FromName:
+          type: string
+        MailboxHash:
+          type: string
+        MessageID:
+          type: string
+        OriginalRecipient:
+          type: string
+        ReplyTo:
+          type: string
+        Status:
+          type: string
+        Subject:
+          type: string
+        Tag:
+          type: string
+        To:
+          type: string
+        ToFull:
+          items:
+            $ref: '#/components/schemas/EmailNameAddressPair'
+          type: array
+    InboundMessageFullDetailsResponse:
+      properties:
+        Attachments:
+          items:
+            $ref: '#/components/schemas/Attachment'
+          type: array
+        BlockedReason:
+          type: string
+        Cc:
+          type: string
+        CcFull:
+          items:
+            $ref: '#/components/schemas/EmailNameAddressPair'
+          type: array
+        Date:
+          type: string
+        From:
+          type: string
+        FromFull:
+          $ref: '#/components/schemas/InboundMessageDetail_FromFull'
+        FromName:
+          type: string
+        Headers:
+          items:
+            $ref: '#/components/schemas/MessageHeader'
+          type: array
+        HtmlBody:
+          type: string
+        MailboxHash:
+          type: string
+        MessageID:
+          type: string
+        OriginalRecipient:
+          type: string
+        ReplyTo:
+          type: string
+        Status:
+          type: string
+        Subject:
+          type: string
+        Tag:
+          type: string
+        TextBody:
+          type: string
+        To:
+          type: string
+        ToFull:
+          items:
+            $ref: '#/components/schemas/EmailNameAddressPair'
+          type: array
+    InboundSearchResponse:
+      description: ""
+      example:
+        TotalCount: 0
+        InboundMessages:
+        - Cc: Cc
+          Status: Status
+          CcFull:
+          - Email: Email
+            Name: Name
+          - Email: Email
+            Name: Name
+          From: From
+          OriginalRecipient: OriginalRecipient
+          Attachments:
+          - ContentType: ContentType
+            Content: Content
+            ContentID: ContentID
+            Name: Name
+          - ContentType: ContentType
+            Content: Content
+            ContentID: ContentID
+            Name: Name
+          Date: Date
+          Subject: Subject
+          ReplyTo: ReplyTo
+          FromName: FromName
+          MailboxHash: MailboxHash
+          Tag: Tag
+          To: To
+          FromFull:
+            Email: Email
+            Name: Name
+          ToFull:
+          - Email: Email
+            Name: Name
+          - Email: Email
+            Name: Name
+          MessageID: MessageID
+        - Cc: Cc
+          Status: Status
+          CcFull:
+          - Email: Email
+            Name: Name
+          - Email: Email
+            Name: Name
+          From: From
+          OriginalRecipient: OriginalRecipient
+          Attachments:
+          - ContentType: ContentType
+            Content: Content
+            ContentID: ContentID
+            Name: Name
+          - ContentType: ContentType
+            Content: Content
+            ContentID: ContentID
+            Name: Name
+          Date: Date
+          Subject: Subject
+          ReplyTo: ReplyTo
+          FromName: FromName
+          MailboxHash: MailboxHash
+          Tag: Tag
+          To: To
+          FromFull:
+            Email: Email
+            Name: Name
+          ToFull:
+          - Email: Email
+            Name: Name
+          - Email: Email
+            Name: Name
+          MessageID: MessageID
+      properties:
+        InboundMessages:
+          items:
+            $ref: '#/components/schemas/InboundMessageDetail'
+          type: array
+        TotalCount:
+          type: integer
+      x-konfig-is-used-in-successful-response: true
+    MessageClickSearchResponse:
+      properties:
+        Clicks:
+          items:
+            $ref: '#/components/schemas/ExtendedMessageClickEventInformation'
+          type: array
+        TotalCount:
+          type: integer
+    MessageEventDetails:
+      description: ""
+      properties:
+        Details:
+          $ref: '#/components/schemas/MessageEventDetails_Details'
+        ReceivedAt:
+          format: date-time
+          type: string
+        Recipient:
+          type: string
+        Type:
+          type: string
+    MessageHeader:
+      description: A single header for an email message.
+      example:
+        Value: Value
+        Name: Name
+      properties:
+        Name:
+          description: The header's name.
+          type: string
+        Value:
+          description: The header's value.
+          type: string
+    MessageOpenSearchResponse:
+      properties:
+        Opens:
+          items:
+            $ref: '#/components/schemas/ExtendedMessageOpenEventInformation'
+          type: array
+        TotalCount:
+          type: integer
+    OutboundMessageDetail:
+      description: ""
+      example:
+        Cc:
+        - Email: Email
+          Name: Name
+        - Email: Email
+          Name: Name
+        Status: Status
+        Bcc:
+        - Email: Email
+          Name: Name
+        - Email: Email
+          Name: Name
+        Recipients:
+        - Recipients
+        - Recipients
+        TrackLinks: None
+        From: From
+        Attachments:
+        - ContentType: ContentType
+          Content: Content
+          ContentID: ContentID
+          Name: Name
+        - ContentType: ContentType
+          Content: Content
+          ContentID: ContentID
+          Name: Name
+        Subject: Subject
+        TrackOpens: true
+        Tag: Tag
+        To:
+        - Email: Email
+          Name: Name
+        - Email: Email
+          Name: Name
+        ReceivedAt: 2000-01-23T04:56:07.000+00:00
+        MessageID: MessageID
+      properties:
+        Attachments:
+          items:
+            $ref: '#/components/schemas/Attachment'
+          type: array
+        Bcc:
+          items:
+            $ref: '#/components/schemas/EmailNameAddressPair'
+          type: array
+        Cc:
+          items:
+            $ref: '#/components/schemas/EmailNameAddressPair'
+          type: array
+        From:
+          type: string
+        MessageID:
+          type: string
+        ReceivedAt:
+          format: date-time
+          type: string
+        Recipients:
+          items:
+            type: string
+          type: array
+        Status:
+          type: string
+        Subject:
+          type: string
+        Tag:
+          type: string
+        To:
+          items:
+            $ref: '#/components/schemas/EmailNameAddressPair'
+          type: array
+        TrackLinks:
+          enum:
+          - None
+          - HtmlAndText
+          - HtmlOnly
+          - TextOnly
+          type: string
+        TrackOpens:
+          type: boolean
+    OutboundMessageDetailsResponse:
+      properties:
+        Attachments:
+          items:
+            $ref: '#/components/schemas/Attachment'
+          type: array
+        Bcc:
+          items:
+            $ref: '#/components/schemas/EmailNameAddressPair'
+          type: array
+        Body:
+          type: string
+        Cc:
+          items:
+            $ref: '#/components/schemas/EmailNameAddressPair'
+          type: array
+        From:
+          type: string
+        HtmlBody:
+          type: string
+        MessageEvents:
+          items:
+            $ref: '#/components/schemas/MessageEventDetails'
+          type: array
+        MessageID:
+          type: string
+        ReceivedAt:
+          format: date-time
+          type: string
+        Recipients:
+          items:
+            type: string
+          type: array
+        Status:
+          type: string
+        Subject:
+          type: string
+        Tag:
+          type: string
+        TextBody:
+          type: string
+        To:
+          items:
+            $ref: '#/components/schemas/EmailNameAddressPair'
+          type: array
+        TrackLinks:
+          enum:
+          - None
+          - HtmlAndText
+          - HtmlOnly
+          - TextOnly
+          type: string
+        TrackOpens:
+          type: boolean
+    OutboundMessageDumpResponse:
+      properties:
+        Body:
+          description: Raw source of message. If no dump is available this will return
+            an empty string.
+          type: string
+    OutboundOverviewStatsResponse:
+      description: ""
+      example:
+        TotalClicks: 9
+        Opens: 1
+        WithPlatformRecorded: 6
+        WithLinkTracking: 1
+        WithOpenTracking: 1
+        SMTPAPIErrors: 5
+        SpamComplaints: 2
+        UniqueOpens: 7
+        WithClientRecorded: 1
+        SpamComplaintsRate: 7
+        BounceRate: 0
+        Tracked: 2
+        TotalTrackedLinksSent: 3
+        Bounced: 6
+        UniqueLinksClicked: 4
+        Sent: 5
+      properties:
+        BounceRate:
+          type: integer
+        Bounced:
+          type: integer
+        Opens:
+          type: integer
+        SMTPAPIErrors:
+          type: integer
+        Sent:
+          type: integer
+        SpamComplaints:
+          type: integer
+        SpamComplaintsRate:
+          type: integer
+        TotalClicks:
+          type: integer
+        TotalTrackedLinksSent:
+          type: integer
+        Tracked:
+          type: integer
+        UniqueLinksClicked:
+          type: integer
+        UniqueOpens:
+          type: integer
+        WithClientRecorded:
+          type: integer
+        WithLinkTracking:
+          type: integer
+        WithOpenTracking:
+          type: integer
+        WithPlatformRecorded:
+          type: integer
+      x-konfig-is-used-in-successful-response: true
+    OutboundSearchResponse:
+      description: ""
+      example:
+        TotalCount: 0
+        Messages:
+        - Cc:
+          - Email: Email
+            Name: Name
+          - Email: Email
+            Name: Name
+          Status: Status
+          Bcc:
+          - Email: Email
+            Name: Name
+          - Email: Email
+            Name: Name
+          Recipients:
+          - Recipients
+          - Recipients
+          TrackLinks: None
+          From: From
+          Attachments:
+          - ContentType: ContentType
+            Content: Content
+            ContentID: ContentID
+            Name: Name
+          - ContentType: ContentType
+            Content: Content
+            ContentID: ContentID
+            Name: Name
+          Subject: Subject
+          TrackOpens: true
+          Tag: Tag
+          To:
+          - Email: Email
+            Name: Name
+          - Email: Email
+            Name: Name
+          ReceivedAt: 2000-01-23T04:56:07.000+00:00
+          MessageID: MessageID
+        - Cc:
+          - Email: Email
+            Name: Name
+          - Email: Email
+            Name: Name
+          Status: Status
+          Bcc:
+          - Email: Email
+            Name: Name
+          - Email: Email
+            Name: Name
+          Recipients:
+          - Recipients
+          - Recipients
+          TrackLinks: None
+          From: From
+          Attachments:
+          - ContentType: ContentType
+            Content: Content
+            ContentID: ContentID
+            Name: Name
+          - ContentType: ContentType
+            Content: Content
+            ContentID: ContentID
+            Name: Name
+          Subject: Subject
+          TrackOpens: true
+          Tag: Tag
+          To:
+          - Email: Email
+            Name: Name
+          - Email: Email
+            Name: Name
+          ReceivedAt: 2000-01-23T04:56:07.000+00:00
+          MessageID: MessageID
+      properties:
+        Messages:
+          items:
+            $ref: '#/components/schemas/OutboundMessageDetail'
+          type: array
+        TotalCount:
+          type: integer
+      x-konfig-is-used-in-successful-response: true
+    SendEmailBatchRequest:
+      items:
+        $ref: '#/components/schemas/SendEmailRequest'
+      type: array
+    SendEmailBatchResponse:
+      items:
+        $ref: '#/components/schemas/SendEmailResponse'
+      type: array
+      x-konfig-is-used-in-successful-response: true
+    SendEmailRequest:
+      example:
+        Cc: Cc
+        Bcc: Bcc
+        Headers:
+        - Value: Value
+          Name: Name
+        - Value: Value
+          Name: Name
+        TrackLinks: None
+        From: From
+        Attachments:
+        - ContentType: ContentType
+          Content: Content
+          ContentID: ContentID
+          Name: Name
+        - ContentType: ContentType
+          Content: Content
+          ContentID: ContentID
+          Name: Name
+        Subject: Subject
+        TrackOpens: true
+        ReplyTo: ReplyTo
+        TextBody: TextBody
+        HtmlBody: HtmlBody
+        Tag: Tag
+        To: To
+      properties:
+        Attachments:
+          items:
+            $ref: '#/components/schemas/Attachment'
+          type: array
+        Bcc:
+          description: Bcc recipient email address. Multiple addresses are comma seperated.
+            Max 50.
+          type: string
+        Cc:
+          description: Recipient email address. Multiple addresses are comma seperated.
+            Max 50.
+          type: string
+        From:
+          description: The sender email address. Must have a registered and confirmed
+            Sender Signature.
+          type: string
+        Headers:
+          items:
+            $ref: '#/components/schemas/MessageHeader'
+          type: array
+        HtmlBody:
+          description: If no TextBody specified HTML email message
+          type: string
+        ReplyTo:
+          description: Reply To override email address. Defaults to the Reply To set
+            in the sender signature.
+          type: string
+        Subject:
+          description: Email Subject
+          type: string
+        Tag:
+          description: Email tag that allows you to categorize outgoing emails and
+            get detailed statistics.
+          type: string
+        TextBody:
+          description: If no HtmlBody specified Plain text email message
+          type: string
+        To:
+          description: Recipient email address. Multiple addresses are comma seperated.
+            Max 50.
+          type: string
+        TrackLinks:
+          description: "Replace links in content to enable \"click tracking\" stats.\
+            \ Default is 'null', which uses the server's LinkTracking setting'."
+          enum:
+          - None
+          - HtmlAndText
+          - HtmlOnly
+          - TextOnly
+          type: string
+        TrackOpens:
+          description: Activate open tracking for this email.
+          type: boolean
+    SendEmailResponse:
+      description: The standard response when a postmark message is sent
+      example:
+        Message: Message
+        SubmittedAt: 2000-01-23T04:56:07.000+00:00
+        ErrorCode: 0
+        To: To
+        MessageID: MessageID
+      properties:
+        ErrorCode:
+          type: integer
+        Message:
+          type: string
+        MessageID:
+          type: string
+        SubmittedAt:
+          format: date-time
+          type: string
+        To:
+          type: string
+      x-konfig-is-used-in-successful-response: true
+    SendEmailTemplatedBatchRequest:
+      example:
+        Messages:
+        - Cc: Cc
+          Bcc: Bcc
+          InlineCss: true
+          Headers:
+          - Value: Value
+            Name: Name
+          - Value: Value
+            Name: Name
+          TrackLinks: None
+          From: From
+          TemplateModel: "{}"
+          Attachments:
+          - ContentType: ContentType
+            Content: Content
+            ContentID: ContentID
+            Name: Name
+          - ContentType: ContentType
+            Content: Content
+            ContentID: ContentID
+            Name: Name
+          TemplateAlias: TemplateAlias
+          TrackOpens: true
+          ReplyTo: ReplyTo
+          Tag: Tag
+          To: To
+          TemplateId: 0
+        - Cc: Cc
+          Bcc: Bcc
+          InlineCss: true
+          Headers:
+          - Value: Value
+            Name: Name
+          - Value: Value
+            Name: Name
+          TrackLinks: None
+          From: From
+          TemplateModel: "{}"
+          Attachments:
+          - ContentType: ContentType
+            Content: Content
+            ContentID: ContentID
+            Name: Name
+          - ContentType: ContentType
+            Content: Content
+            ContentID: ContentID
+            Name: Name
+          TemplateAlias: TemplateAlias
+          TrackOpens: true
+          ReplyTo: ReplyTo
+          Tag: Tag
+          To: To
+          TemplateId: 0
+      properties:
+        Messages:
+          items:
+            $ref: '#/components/schemas/EmailWithTemplateRequest'
+          type: array
+    SentCountsResponse:
+      description: The result of a get sent counts operation.
+      example:
+        Days:
+        - Date: Date
+          Sent: 0
+        - Date: Date
+          Sent: 0
+        Sent: 6
+      properties:
+        Days:
+          items:
+            $ref: '#/components/schemas/SentCountsResponse_Days_inner'
+          type: array
+        Sent:
+          type: integer
+      x-konfig-is-used-in-successful-response: true
+    ServerConfigurationResponse:
+      properties:
+        ApiTokens:
+          items:
+            type: string
+          type: array
+        BounceHookUrl:
+          type: string
+        ClickHookUrl:
+          type: string
+        Color:
+          enum:
+          - purple
+          - blue
+          - turqoise
+          - green
+          - red
+          - yellow
+          - grey
+          type: string
+        DeliveryHookUrl:
+          type: string
+        ID:
+          type: integer
+        InboundAddress:
+          format: email
+          type: string
+        InboundDomain:
+          type: string
+        InboundHash:
+          type: string
+        InboundHookUrl:
+          type: string
+        InboundSpamThreshold:
+          type: integer
+        Name:
+          type: string
+        OpenHookUrl:
+          type: string
+        PostFirstOpenOnly:
+          type: boolean
+        RawEmailEnabled:
+          type: boolean
+        ServerLink:
+          type: string
+        SmtpApiActivated:
+          type: boolean
+        TrackLinks:
+          enum:
+          - None
+          - HtmlAndText
+          - HtmlOnly
+          - TextOnly
+          type: string
+        TrackOpens:
+          type: boolean
+    StandardPostmarkResponse:
+      description: A Postmark API error.
+      example:
+        Message: Message
+        ErrorCode: 0
+      properties:
+        ErrorCode:
+          type: integer
+        Message:
+          type: string
+      x-konfig-is-used-in-non-successful-response: true
+      x-konfig-is-used-in-successful-response: true
+    TemplateDetailResponse:
+      properties:
+        Active:
+          description: Indicates that this template may be used for sending email.
+          type: boolean
+        Alias:
+          description: The user-supplied alias for this template.
+          type: string
+        AssociatedServerId:
+          description: The ID of the Server with which this template is associated.
+          type: integer
+        HtmlBody:
+          description: The content to use for the HtmlBody when this template is used
+            to send email.
+          type: string
+        Name:
+          description: The display name for the template.
+          type: string
+        Subject:
+          description: The content to use for the Subject when this template is used
+            to send email.
+          type: string
+        TemplateID:
+          description: The ID associated with the template.
+          type: integer
+        TextBody:
+          description: The content to use for the TextBody when this template is used
+            to send email.
+          type: string
+    TemplateListingResponse:
+      properties:
+        Templates API:
+          description: Basic information for each Template returned from the query.
+          items:
+            $ref: '#/components/schemas/TemplateRecordResponse'
+          type: array
+        TotalCount:
+          description: The total number of Templates API associated with this server.
+          type: number
+    TemplateRecordResponse:
+      properties:
+        Active:
+          description: True if this template is currently available for use.
+          type: boolean
+        Alias:
+          description: The user-supplied alias for this template.
+          type: string
+        Name:
+          description: The display name for this template.
+          type: string
+        TemplateId:
+          description: The associated ID for this template.
+          format: int
+          type: number
+    TemplateValidationError:
+      properties:
+        CharacterPosition:
+          type: integer
+        Line:
+          type: integer
+        Message:
+          type: string
+    TemplateValidationRequest:
+      example:
+        TestRenderModel: "{}"
+        TextBody: TextBody
+        HtmlBody: HtmlBody
+        InlineCssForHtmlTestRender: true
+        Subject: Subject
+      properties:
+        HtmlBody:
+          description: |
+            The html body content to validate. Must be specified if Subject or
+            TextBody are not. See our template language documentation for more
+            information on the syntax for this field.
+          type: string
+        InlineCssForHtmlTestRender:
+          default: true
+          description: |
+            When HtmlBody is specified, the test render will have style blocks
+            inlined as style attributes on matching html elements. You may disable
+            the css inlining behavior by passing false for this parameter.
+          example: true
+          type: boolean
+          x-konfig-original-example: true
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-TemplateValidationRequest-properties-InlineCssForHtmlTestRender
+        Subject:
+          description: |
+            The subject content to validate. Must be specified if HtmlBody or
+            TextBody are not. See our template language documentation for more
+            information on the syntax for this field.
+          type: string
+        TestRenderModel:
+          description: The model to be used when rendering test content.
+          type: object
+        TextBody:
+          description: |
+            The text body content to validate. Must be specified if HtmlBody or
+            Subject are not. See our template language documentation for more
+            information on the syntax for this field.
+          type: string
+    TemplateValidationResponse:
+      properties:
+        AllContentIsValid:
+          type: boolean
+        HtmlBody:
+          $ref: '#/components/schemas/TemplateValidationResult'
+        Subject:
+          $ref: '#/components/schemas/TemplateValidationResult'
+        SuggestedTemplateModel:
+          type: object
+        TextBody:
+          $ref: '#/components/schemas/TemplateValidationResult'
+    TemplateValidationResult:
+      properties:
+        ContentIsValid:
+          type: boolean
+        RenderedContent:
+          type: string
+        ValidationErrors:
+          items:
+            $ref: '#/components/schemas/TemplateValidationError'
+          type: array
+    BouncesApiGetBounceResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-BouncesApiGetBounceResponse
+      x-konfig-is-used-in-successful-response: true
+    BouncesApiActivateBounceResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-BouncesApiActivateBounceResponse
+      x-konfig-is-used-in-successful-response: true
+    BouncesApiGetDumpResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-BouncesApiGetDumpResponse
+      x-konfig-is-used-in-successful-response: true
+    MessagesApiGetInboundMessageDetailsResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-MessagesApiGetInboundMessageDetailsResponse
+      x-konfig-is-used-in-successful-response: true
+    MessagesApiGetAllClicksResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-MessagesApiGetAllClicksResponse
+      x-konfig-is-used-in-successful-response: true
+    MessagesApiGetMessageClicksResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-MessagesApiGetMessageClicksResponse
+      x-konfig-is-used-in-successful-response: true
+    MessagesApiListOpensForOutboundResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-MessagesApiListOpensForOutboundResponse
+      x-konfig-is-used-in-successful-response: true
+    MessagesApiGetMessageOpensResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-MessagesApiGetMessageOpensResponse
+      x-konfig-is-used-in-successful-response: true
+    MessagesApiGetOutboundMessageDetailsResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-MessagesApiGetOutboundMessageDetailsResponse
+      x-konfig-is-used-in-successful-response: true
+    MessagesApiGetMessageDumpResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-MessagesApiGetMessageDumpResponse
+      x-konfig-is-used-in-successful-response: true
+    ServerConfigurationApiGetConfigurationResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-ServerConfigurationApiGetConfigurationResponse
+      x-konfig-is-used-in-successful-response: true
+    ServerConfigurationApiUpdateConfigurationResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-ServerConfigurationApiUpdateConfigurationResponse
+      x-konfig-is-used-in-successful-response: true
+    StatsApiGetBounceCountsResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-StatsApiGetBounceCountsResponse
+      x-konfig-is-used-in-successful-response: true
+    StatsApiGetOutboundClickCountsResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-StatsApiGetOutboundClickCountsResponse
+      x-konfig-is-used-in-successful-response: true
+    StatsApiGetOutboundClicksBrowserFamiliesResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-StatsApiGetOutboundClicksBrowserFamiliesResponse
+      x-konfig-is-used-in-successful-response: true
+    StatsApiGetOutboundClicksLocationResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-StatsApiGetOutboundClicksLocationResponse
+      x-konfig-is-used-in-successful-response: true
+    StatsApiGetBrowserPlatformUsageResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-StatsApiGetBrowserPlatformUsageResponse
+      x-konfig-is-used-in-successful-response: true
+    StatsApiGetEmailOpenCountsResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-StatsApiGetEmailOpenCountsResponse
+      x-konfig-is-used-in-successful-response: true
+    StatsApiGetEmailClientUsageResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-StatsApiGetEmailClientUsageResponse
+      x-konfig-is-used-in-successful-response: true
+    StatsApiGetEmailPlatformUsageResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-StatsApiGetEmailPlatformUsageResponse
+      x-konfig-is-used-in-successful-response: true
+    StatsApiGetSpamComplaintsResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-StatsApiGetSpamComplaintsResponse
+      x-konfig-is-used-in-successful-response: true
+    StatsApiGetTrackedEmailCountsResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-StatsApiGetTrackedEmailCountsResponse
+      x-konfig-is-used-in-successful-response: true
+    TemplatesApiListTemplatesResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-TemplatesApiListTemplatesResponse
+      x-konfig-is-used-in-successful-response: true
+    TemplatesApiCreateTemplateResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-TemplatesApiCreateTemplateResponse
+      x-konfig-is-used-in-successful-response: true
+    TemplatesApiValidateTemplateContentResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-TemplatesApiValidateTemplateContentResponse
+      x-konfig-is-used-in-successful-response: true
+    TemplatesApiDeleteTemplateResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-TemplatesApiDeleteTemplateResponse
+      x-konfig-is-used-in-successful-response: true
+    TemplatesApiGetTemplateByIdResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-TemplatesApiGetTemplateByIdResponse
+      x-konfig-is-used-in-successful-response: true
+    TemplatesApiUpdateTemplateResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-TemplatesApiUpdateTemplateResponse
+      x-konfig-is-used-in-successful-response: true
+    InboundRulesApiListTriggersResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-InboundRulesApiListTriggersResponse
+      x-konfig-is-used-in-successful-response: true
+    InboundRulesApiCreateTriggerResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-InboundRulesApiCreateTriggerResponse
+      x-konfig-is-used-in-successful-response: true
+    konfig-generated-schema-paths--messages-outbound-clicks-messageid-get-parameters-1-schema:
+      example: 1
+      type: number
+      x-do-not-generate: true
+    konfig-generated-schema-paths--messages-outbound-clicks-messageid-get-parameters-2-schema:
+      example: 0
+      type: number
+      x-do-not-generate: true
+    konfig-generated-schema-paths--messages-outbound-opens-messageid-get-parameters-1-schema:
+      example: 1
+      type: number
+      x-do-not-generate: true
+    konfig-generated-schema-paths--messages-outbound-opens-messageid-get-parameters-2-schema:
+      example: 0
+      type: number
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-EmailWithTemplateRequest-properties-InlineCss:
+      example: true
+      type: boolean
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-TemplateValidationRequest-properties-InlineCssForHtmlTestRender:
+      example: true
+      type: boolean
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-BouncesApiGetBounceResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-BouncesApiActivateBounceResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-BouncesApiGetDumpResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-MessagesApiGetInboundMessageDetailsResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-MessagesApiGetAllClicksResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-MessagesApiGetMessageClicksResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-MessagesApiListOpensForOutboundResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-MessagesApiGetMessageOpensResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-MessagesApiGetOutboundMessageDetailsResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-MessagesApiGetMessageDumpResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-ServerConfigurationApiGetConfigurationResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-ServerConfigurationApiUpdateConfigurationResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-StatsApiGetBounceCountsResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-StatsApiGetOutboundClickCountsResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-StatsApiGetOutboundClicksBrowserFamiliesResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-StatsApiGetOutboundClicksLocationResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-StatsApiGetBrowserPlatformUsageResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-StatsApiGetEmailOpenCountsResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-StatsApiGetEmailClientUsageResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-StatsApiGetEmailPlatformUsageResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-StatsApiGetSpamComplaintsResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-StatsApiGetTrackedEmailCountsResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-TemplatesApiListTemplatesResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-TemplatesApiCreateTemplateResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-TemplatesApiValidateTemplateContentResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-TemplatesApiDeleteTemplateResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-TemplatesApiGetTemplateByIdResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-TemplatesApiUpdateTemplateResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-InboundRulesApiListTriggersResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-InboundRulesApiCreateTriggerResponse:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-single-parameter-schema-get--bounces:
+      properties:
+        count:
+          maximum: 500
+          type: integer
+        offset:
+          type: integer
+        type:
+          enum:
+          - HardBounce
+          - Transient
+          - Unsubscribe
+          - Subscribe
+          - AutoResponder
+          - AddressChange
+          - DnsError
+          - SpamNotification
+          - OpenRelayTest
+          - Unknown
+          - SoftBounce
+          - VirusNotification
+          - MailFrontier Matador.
+          - BadEmailAddress
+          - SpamComplaint
+          - ManuallyDeactivated
+          - Unconfirmed
+          - Blocked
+          - SMTPApiError
+          - InboundError
+          - DMARCPolicy
+          - TemplateRenderingFailed
+          type: string
+        inactive:
+          type: boolean
+        emailFilter:
+          format: email
+          type: string
+        messageID:
+          type: string
+        tag:
+          type: string
+        todate:
+          format: date
+          type: string
+        fromdate:
+          format: date
+          type: string
+      required:
+      - count
+      - offset
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - count
+      - offset
+      - type
+      - inactive
+      - emailFilter
+      - messageID
+      - tag
+      - todate
+      - fromdate
+    konfig-generated-schema-single-parameter-schema-get--bounces-bounceid:
+      properties:
+        bounceid:
+          format: int64
+          type: integer
+      required:
+      - bounceid
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - bounceid
+    konfig-generated-schema-single-parameter-schema-put--bounces-bounceid-activate:
+      properties:
+        bounceid:
+          format: int64
+          type: integer
+      required:
+      - bounceid
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - bounceid
+    konfig-generated-schema-single-parameter-schema-get--bounces-bounceid-dump:
+      properties:
+        bounceid:
+          format: int64
+          type: integer
+      required:
+      - bounceid
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - bounceid
+    konfig-generated-schema-single-parameter-schema-get--deliverystats:
+      properties: {}
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-post--email:
+      properties:
+        Attachments:
+          $ref: '#/components/schemas/AttachmentCollection'
+        Bcc:
+          description: Bcc recipient email address. Multiple addresses are comma seperated.
+            Max 50.
+          type: string
+        Cc:
+          description: Recipient email address. Multiple addresses are comma seperated.
+            Max 50.
+          type: string
+        From:
+          description: The sender email address. Must have a registered and confirmed
+            Sender Signature.
+          type: string
+        Headers:
+          $ref: '#/components/schemas/HeaderCollection'
+        HtmlBody:
+          description: If no TextBody specified HTML email message
+          type: string
+        ReplyTo:
+          description: Reply To override email address. Defaults to the Reply To set
+            in the sender signature.
+          type: string
+        Subject:
+          description: Email Subject
+          type: string
+        Tag:
+          description: Email tag that allows you to categorize outgoing emails and
+            get detailed statistics.
+          type: string
+        TextBody:
+          description: If no HtmlBody specified Plain text email message
+          type: string
+        To:
+          description: Recipient email address. Multiple addresses are comma seperated.
+            Max 50.
+          type: string
+        TrackLinks:
+          description: "Replace links in content to enable \"click tracking\" stats.\
+            \ Default is 'null', which uses the server's LinkTracking setting'."
+          enum:
+          - None
+          - HtmlAndText
+          - HtmlOnly
+          - TextOnly
+          type: string
+        TrackOpens:
+          description: Activate open tracking for this email.
+          type: boolean
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-post--email-batch:
+      properties: {}
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-post--email-batchWithTemplates:
+      properties:
+        Messages:
+          items:
+            $ref: '#/components/schemas/EmailWithTemplateRequest'
+          type: array
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-post--email-withTemplate:
+      properties:
+        Attachments:
+          $ref: '#/components/schemas/AttachmentCollection'
+        Bcc:
+          format: email
+          type: string
+        Cc:
+          format: email
+          type: string
+        From:
+          format: email
+          type: string
+        Headers:
+          $ref: '#/components/schemas/HeaderCollection'
+        InlineCss:
+          default: true
+          example: true
+          type: boolean
+          x-konfig-original-example: true
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-EmailWithTemplateRequest-properties-InlineCss
+        ReplyTo:
+          type: string
+        Tag:
+          type: string
+        TemplateAlias:
+          description: Required if 'TemplateId' is not specified.
+          type: string
+        TemplateId:
+          description: Required if 'TemplateAlias' is not specified.
+          type: integer
+        TemplateModel:
+          type: object
+        To:
+          format: email
+          type: string
+        TrackLinks:
+          description: "Replace links in content to enable \"click tracking\" stats.\
+            \ Default is 'null', which uses the server's LinkTracking setting'."
+          enum:
+          - None
+          - HtmlAndText
+          - HtmlOnly
+          - TextOnly
+          type: string
+        TrackOpens:
+          description: Activate open tracking for this email.
+          type: boolean
+      required:
+      - From
+      - TemplateAlias
+      - TemplateId
+      - TemplateModel
+      - To
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-get--messages-inbound:
+      properties:
+        count:
+          type: integer
+        offset:
+          type: integer
+        recipient:
+          format: email
+          type: string
+        fromemail:
+          format: email
+          type: string
+        subject:
+          type: string
+        mailboxhash:
+          type: string
+        tag:
+          type: string
+        status:
+          enum:
+          - blocked
+          - processed
+          - queued
+          - failed
+          - scheduled
+          type: string
+        todate:
+          format: date
+          type: string
+        fromdate:
+          format: date
+          type: string
+      required:
+      - count
+      - offset
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - count
+      - offset
+      - recipient
+      - fromemail
+      - subject
+      - mailboxhash
+      - tag
+      - status
+      - todate
+      - fromdate
+    konfig-generated-schema-single-parameter-schema-put--messages-inbound-messageid-bypass:
+      properties:
+        messageid:
+          type: string
+      required:
+      - messageid
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - messageid
+    konfig-generated-schema-single-parameter-schema-get--messages-inbound-messageid-details:
+      properties:
+        messageid:
+          type: string
+      required:
+      - messageid
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - messageid
+    konfig-generated-schema-single-parameter-schema-put--messages-inbound-messageid-retry:
+      properties:
+        messageid:
+          type: string
+      required:
+      - messageid
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - messageid
+    konfig-generated-schema-single-parameter-schema-get--messages-outbound:
+      properties:
+        count:
+          type: integer
+        offset:
+          type: integer
+        recipient:
+          format: email
+          type: string
+        fromemail:
+          format: email
+          type: string
+        tag:
+          type: string
+        status:
+          enum:
+          - queued
+          - sent
+          type: string
+        todate:
+          format: date
+          type: string
+        fromdate:
+          format: date
+          type: string
+      required:
+      - count
+      - offset
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - count
+      - offset
+      - recipient
+      - fromemail
+      - tag
+      - status
+      - todate
+      - fromdate
+    konfig-generated-schema-single-parameter-schema-get--messages-outbound-clicks:
+      properties:
+        count:
+          type: integer
+        offset:
+          type: integer
+        recipient:
+          type: string
+        tag:
+          type: string
+        client_name:
+          type: string
+        client_company:
+          type: string
+        client_family:
+          type: string
+        os_name:
+          type: string
+        os_family:
+          type: string
+        os_company:
+          type: string
+        platform:
+          type: string
+        country:
+          type: string
+        region:
+          type: string
+        city:
+          type: string
+      required:
+      - count
+      - offset
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - count
+      - offset
+      - recipient
+      - tag
+      - client_name
+      - client_company
+      - client_family
+      - os_name
+      - os_family
+      - os_company
+      - platform
+      - country
+      - region
+      - city
+    konfig-generated-schema-single-parameter-schema-get--messages-outbound-clicks-messageid:
+      properties:
+        messageid:
+          type: string
+        count:
+          default: 1
+          example: 1
+          maximum: 500
+          minimum: 1
+          type: integer
+          x-konfig-original-example: 1
+          x-konfig-generated-schema: konfig-generated-schema-paths--messages-outbound-clicks-messageid-get-parameters-1-schema
+        offset:
+          default: 0
+          example: 0
+          minimum: 0
+          type: integer
+          x-konfig-original-example: 0
+          x-konfig-generated-schema: konfig-generated-schema-paths--messages-outbound-clicks-messageid-get-parameters-2-schema
+      required:
+      - count
+      - messageid
+      - offset
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - messageid
+      - count
+      - offset
+    konfig-generated-schema-single-parameter-schema-get--messages-outbound-opens:
+      properties:
+        count:
+          type: integer
+        offset:
+          type: integer
+        recipient:
+          type: string
+        tag:
+          type: string
+        client_name:
+          type: string
+        client_company:
+          type: string
+        client_family:
+          type: string
+        os_name:
+          type: string
+        os_family:
+          type: string
+        os_company:
+          type: string
+        platform:
+          type: string
+        country:
+          type: string
+        region:
+          type: string
+        city:
+          type: string
+      required:
+      - count
+      - offset
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - count
+      - offset
+      - recipient
+      - tag
+      - client_name
+      - client_company
+      - client_family
+      - os_name
+      - os_family
+      - os_company
+      - platform
+      - country
+      - region
+      - city
+    konfig-generated-schema-single-parameter-schema-get--messages-outbound-opens-messageid:
+      properties:
+        messageid:
+          type: string
+        count:
+          default: 1
+          example: 1
+          maximum: 500
+          minimum: 1
+          type: integer
+          x-konfig-original-example: 1
+          x-konfig-generated-schema: konfig-generated-schema-paths--messages-outbound-opens-messageid-get-parameters-1-schema
+        offset:
+          default: 0
+          example: 0
+          minimum: 0
+          type: integer
+          x-konfig-original-example: 0
+          x-konfig-generated-schema: konfig-generated-schema-paths--messages-outbound-opens-messageid-get-parameters-2-schema
+      required:
+      - count
+      - messageid
+      - offset
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - messageid
+      - count
+      - offset
+    konfig-generated-schema-single-parameter-schema-get--messages-outbound-messageid-details:
+      properties:
+        messageid:
+          type: string
+      required:
+      - messageid
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - messageid
+    konfig-generated-schema-single-parameter-schema-get--messages-outbound-messageid-dump:
+      properties:
+        messageid:
+          type: string
+      required:
+      - messageid
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - messageid
+    konfig-generated-schema-single-parameter-schema-get--server:
+      properties: {}
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-put--server:
+      properties:
+        BounceHookUrl:
+          type: string
+        ClickHookUrl:
+          description: Webhook url allowing real-time notification when tracked links
+            are clicked.
+          type: string
+        Color:
+          enum:
+          - purple
+          - blue
+          - turqoise
+          - green
+          - red
+          - yellow
+          - grey
+          type: string
+        DeliveryHookUrl:
+          type: string
+        InboundDomain:
+          type: string
+        InboundHookUrl:
+          type: string
+        InboundSpamThreshold:
+          type: integer
+        Name:
+          type: string
+        OpenHookUrl:
+          type: string
+        PostFirstOpenOnly:
+          type: boolean
+        RawEmailEnabled:
+          type: boolean
+        SmtpApiActivated:
+          type: boolean
+        TrackLinks:
+          enum:
+          - None
+          - HtmlAndText
+          - HtmlOnly
+          - TextOnly
+          type: string
+        TrackOpens:
+          type: boolean
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-get--stats-outbound:
+      properties:
+        tag:
+          type: string
+        fromdate:
+          format: date
+          type: string
+        todate:
+          format: date
+          type: string
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - tag
+      - fromdate
+      - todate
+    konfig-generated-schema-single-parameter-schema-get--stats-outbound-bounces:
+      properties:
+        tag:
+          type: string
+        fromdate:
+          format: date
+          type: string
+        todate:
+          format: date
+          type: string
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - tag
+      - fromdate
+      - todate
+    konfig-generated-schema-single-parameter-schema-get--stats-outbound-clicks:
+      properties:
+        tag:
+          type: string
+        fromdate:
+          format: date
+          type: string
+        todate:
+          format: date
+          type: string
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - tag
+      - fromdate
+      - todate
+    konfig-generated-schema-single-parameter-schema-get--stats-outbound-clicks-browserfamilies:
+      properties:
+        tag:
+          type: string
+        fromdate:
+          format: date
+          type: string
+        todate:
+          format: date
+          type: string
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - tag
+      - fromdate
+      - todate
+    konfig-generated-schema-single-parameter-schema-get--stats-outbound-clicks-location:
+      properties:
+        tag:
+          type: string
+        fromdate:
+          format: date
+          type: string
+        todate:
+          format: date
+          type: string
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - tag
+      - fromdate
+      - todate
+    konfig-generated-schema-single-parameter-schema-get--stats-outbound-clicks-platforms:
+      properties:
+        tag:
+          type: string
+        fromdate:
+          format: date
+          type: string
+        todate:
+          format: date
+          type: string
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - tag
+      - fromdate
+      - todate
+    konfig-generated-schema-single-parameter-schema-get--stats-outbound-opens:
+      properties:
+        tag:
+          type: string
+        fromdate:
+          format: date
+          type: string
+        todate:
+          format: date
+          type: string
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - tag
+      - fromdate
+      - todate
+    konfig-generated-schema-single-parameter-schema-get--stats-outbound-opens-emailclients:
+      properties:
+        tag:
+          type: string
+        fromdate:
+          format: date
+          type: string
+        todate:
+          format: date
+          type: string
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - tag
+      - fromdate
+      - todate
+    konfig-generated-schema-single-parameter-schema-get--stats-outbound-opens-platforms:
+      properties:
+        tag:
+          type: string
+        fromdate:
+          format: date
+          type: string
+        todate:
+          format: date
+          type: string
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - tag
+      - fromdate
+      - todate
+    konfig-generated-schema-single-parameter-schema-get--stats-outbound-sends:
+      properties:
+        tag:
+          type: string
+        fromdate:
+          format: date
+          type: string
+        todate:
+          format: date
+          type: string
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - tag
+      - fromdate
+      - todate
+    konfig-generated-schema-single-parameter-schema-get--stats-outbound-spam:
+      properties:
+        tag:
+          type: string
+        fromdate:
+          format: date
+          type: string
+        todate:
+          format: date
+          type: string
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - tag
+      - fromdate
+      - todate
+    konfig-generated-schema-single-parameter-schema-get--stats-outbound-tracked:
+      properties:
+        tag:
+          type: string
+        fromdate:
+          format: date
+          type: string
+        todate:
+          format: date
+          type: string
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - tag
+      - fromdate
+      - todate
+    konfig-generated-schema-single-parameter-schema-get--templates:
+      properties:
+        Count:
+          format: int
+          type: number
+        Offset:
+          format: int
+          type: number
+      required:
+      - Count
+      - Offset
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - Count
+      - Offset
+    konfig-generated-schema-single-parameter-schema-post--templates:
+      properties:
+        Alias:
+          description: "The optional string identifier for referring to this Template\
+            \ (numbers, letters, and '.', '-', '_' characters, starts with a letter)."
+          type: string
+        HtmlBody:
+          description: The HTML template definition for this Template.
+          type: string
+        Name:
+          description: The friendly display name for the template.
+          type: string
+        Subject:
+          description: The Subject template definition for this Template.
+          type: string
+        TextBody:
+          description: The Text template definition for this Template.
+          type: string
+      required:
+      - Name
+      - Subject
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-post--templates-validate:
+      properties:
+        HtmlBody:
+          description: |
+            The html body content to validate. Must be specified if Subject or
+            TextBody are not. See our template language documentation for more
+            information on the syntax for this field.
+          type: string
+        InlineCssForHtmlTestRender:
+          default: true
+          description: |
+            When HtmlBody is specified, the test render will have style blocks
+            inlined as style attributes on matching html elements. You may disable
+            the css inlining behavior by passing false for this parameter.
+          example: true
+          type: boolean
+          x-konfig-original-example: true
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-TemplateValidationRequest-properties-InlineCssForHtmlTestRender
+        Subject:
+          description: |
+            The subject content to validate. Must be specified if HtmlBody or
+            TextBody are not. See our template language documentation for more
+            information on the syntax for this field.
+          type: string
+        TestRenderModel:
+          description: The model to be used when rendering test content.
+          type: object
+        TextBody:
+          description: |
+            The text body content to validate. Must be specified if HtmlBody or
+            Subject are not. See our template language documentation for more
+            information on the syntax for this field.
+          type: string
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-delete--templates-templateIdOrAlias:
+      properties:
+        templateIdOrAlias:
+          type: string
+      required:
+      - templateIdOrAlias
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - templateIdOrAlias
+    konfig-generated-schema-single-parameter-schema-get--templates-templateIdOrAlias:
+      properties:
+        templateIdOrAlias:
+          type: string
+      required:
+      - templateIdOrAlias
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - templateIdOrAlias
+    konfig-generated-schema-single-parameter-schema-put--templates-templateIdOrAlias:
+      properties:
+        templateIdOrAlias:
+          type: string
+        Alias:
+          description: "The optional string identifier for referring to this Template\
+            \ (numbers, letters, and '.', '-', '_' characters, starts with a letter)."
+          type: string
+        HtmlBody:
+          description: The HTML template definition for this Template.
+          type: string
+        Name:
+          description: The friendly display name for the template.
+          type: string
+        Subject:
+          description: The Subject template definition for this Template.
+          type: string
+        TextBody:
+          description: The Text template definition for this Template.
+          type: string
+      required:
+      - TemplateId
+      - templateIdOrAlias
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - templateIdOrAlias
+    konfig-generated-schema-single-parameter-schema-get--triggers-inboundrules:
+      properties:
+        count:
+          type: integer
+        offset:
+          type: integer
+      required:
+      - count
+      - offset
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - count
+      - offset
+    konfig-generated-schema-single-parameter-schema-post--triggers-inboundrules:
+      properties:
+        Rule:
+          format: email
+          type: string
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-delete--triggers-inboundrules-triggerid:
+      properties:
+        triggerid:
+          type: integer
+      required:
+      - triggerid
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - triggerid
+    ExtendedMessageClickEventInformation_Client:
+      description: ""
+      properties:
+        Company:
+          type: string
+        Family:
+          type: string
+        Name:
+          type: string
+    ExtendedMessageClickEventInformation_Geo:
+      properties:
+        City:
+          type: string
+        Coords:
+          type: string
+        Country:
+          type: string
+        CountryISOCode:
+          type: string
+        IP:
+          type: string
+        Region:
+          type: string
+        RegionISOCode:
+          type: string
+        Zip:
+          type: string
+    ExtendedMessageClickEventInformation_OS:
+      properties:
+        Company:
+          type: string
+        Family:
+          type: string
+        Name:
+          type: string
+    InboundMessageDetail_FromFull:
+      description: ""
+      example:
+        Email: Email
+        Name: Name
+      properties:
+        Email:
+          type: string
+        Name:
+          type: string
+    MessageEventDetails_Details:
+      properties:
+        BounceID:
+          type: string
+        DeliveryMessage:
+          type: string
+        DestinationIP:
+          type: string
+        DestinationServer:
+          type: string
+        Summary:
+          type: string
+    SentCountsResponse_Days_inner:
+      example:
+        Date: Date
+        Sent: 0
+      properties:
+        Date:
+          type: string
+        Sent:
+          type: integer
+  securitySchemes:
+    serverToken:
+      in: header
+      name: X-Postmark-Server-Token
+      type: apiKey
+      x-konfig-globally-required-security: true
+
